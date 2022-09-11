@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "559877166460",
+    "project_id": "live-score-f3f21",
+    "storage_bucket": "live-score-f3f21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559877166460:android:0be2f158b7abc9414400f9",
+        "android_client_info": {
+          "package_name": "com.example.football_scores"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559877166460-tn140eus05vd7jmc262pj6g4ehnim6o9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmG3mawIv4tq4ZB-WePVaDUASnJExlj-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559877166460-tn140eus05vd7jmc262pj6g4ehnim6o9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,16 +1,13 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:football_scores/main.dart';
 import 'package:football_scores/models/league_model.dart';
-import 'package:football_scores/modules/login_screen/cubit/cubit.dart';
 import 'package:football_scores/modules/profile_screen/profile_screen.dart';
 import 'package:football_scores/modules/search_screen/search_screen.dart';
 import 'package:football_scores/shared/components/components.dart';
 import 'package:football_scores/shared/components/constants.dart';
 import 'package:football_scores/shared/cubit/cubit.dart';
 import 'package:football_scores/shared/cubit/states.dart';
-import 'package:football_scores/shared/network/local/cache_helper.dart';
 import 'package:football_scores/shared/styles/colors/colors.dart';
 import 'package:football_scores/shared/styles/icon_broken.dart';
 
@@ -19,56 +16,67 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        var cubit = AppCubit.get(context);
+        if (state is AppGetMatchesErrorState ||
+            state is AppGetLeaguesErrorState) {
+          cubit.isError = true;
+        }
+
+        if (state is AppGetMatchesSuccessState ||
+            state is AppGetLeaguesSuccessState) {
+          cubit.isError = false;
+        }
+      },
       builder: (context, state) {
         var cubit = AppCubit.get(context);
         return ConditionalBuilder(
-          condition: true,
+          condition: userModel != null,
           builder: (context) {
-            return ConditionalBuilder(
-              condition: userModel != null,
-              builder: (context) {
-                return Scaffold(
-                  appBar: AppBar(
-                    leading: InkWell(
-                      onTap: () {
-                        navigateTo(context, ProfileScreen());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: CircleAvatar(
-                            child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20)),
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child: buildImage(userModel!.image!,
-                              width: 40, hight: 40),
-                        )),
-                      ),
-                    ),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: IconButton(
-                              onPressed: () {
-                                showSearch(
-                                    context: context, delegate: SearchScreen());
-                              },
-                              icon: const Icon(IconBroken.Search),
-                              color: Colors.grey[700]),
-                        ),
-                      )
-                    ],
-                    centerTitle: true,
-                    title: const Image(
-                      image: AssetImage('assets/images/home_logo.png'),
-                      height: 50,
-                      width: 150,
-                    ),
+            return Scaffold(
+              appBar: AppBar(
+                leading: InkWell(
+                  onTap: () {
+                    navigateTo(context, ProfileScreen());
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: CircleAvatar(
+                        child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20)),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      child: buildImage(userModel!.image ?? "",
+                          width: 40, hight: 40),
+                    )),
                   ),
-                  body: Container(
+                ),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: IconButton(
+                          onPressed: () {
+                            showSearch(
+                                context: context, delegate: SearchScreen());
+                          },
+                          icon: const Icon(IconBroken.Search),
+                          color: Colors.grey[700]),
+                    ),
+                  )
+                ],
+                centerTitle: true,
+                title: const Image(
+                  image: AssetImage('assets/images/home_logo.png'),
+                  height: 50,
+                  width: 150,
+                ),
+              ),
+              body: ConditionalBuilder(
+                condition: !cubit.isError,
+                builder: (context) {
+                  return Container(
                       height: double.infinity,
                       color: Colors.grey[100],
                       child: Padding(
@@ -230,75 +238,53 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                      )),
-                );
-              },
-              fallback: (context) =>
-                  const Center(child: CircularProgressIndicator()),
+                      ));
+                },
+                fallback: (context) {
+                  return buildErrorWidget(state, cubit, context);
+                },
+              ),
             );
           },
-          fallback: (context) => buildErrorScreen(state, cubit, context),
+          fallback: (context) =>
+              const Center(child: CircularProgressIndicator()),
         );
       },
     );
   }
 
-  Widget buildErrorScreen(AppStates state, AppCubit cubit, context) {
+  Widget buildErrorWidget(AppStates state, AppCubit cubit, context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              LoginCubit.get(context).signOut();
-              CacheHelper.removeData(key: 'uid').then((value) {
-                userModel = null;
-                UID = null;
-                navigateAndFinish(context, const MyApp());
-              });
-            },
-            icon: const Icon(IconBroken.Arrow___Left),
+        body: Container(
+      color: Colors.grey[100],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Unexpected error occurred',
+                  style: TextStyle(
+                    fontSize: 20,
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              MaterialButton(
+                onPressed: () {
+                  cubit.getLeagues();
+                  cubit.getMatches(39);
+                },
+                color: premierColor,
+                padding: EdgeInsets.zero,
+                child:
+                    const Text('Retry', style: TextStyle(color: Colors.white)),
+              ),
+            ],
           ),
         ),
-        body: Container(
-          color: Colors.grey[100],
-          child: ConditionalBuilder(
-            condition: (state is! AppGetMatchesErrorState &&
-                state is! AppGetLeaguesErrorState),
-            builder: (context) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            },
-            fallback: (context) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('An unexpected error occurred',
-                          style: TextStyle(
-                            fontSize: 20,
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      MaterialButton(
-                        onPressed: () {
-                          cubit.getLeagues();
-                          cubit.getMatches(39);
-                        },
-                        color: premierColor,
-                        padding: EdgeInsets.zero,
-                        child: const Text('Retry',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ));
+      ),
+    ));
   }
 
   Widget biuldTabItem(AppCubit cubit, LeagueResponse league, int index) {

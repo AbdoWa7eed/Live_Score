@@ -34,26 +34,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => LoginCubit(),),
-        BlocProvider(create: (context) => RegisterCubit(),),
-        BlocProvider(create: (context) => AppCubit()..getUserData(UID)..getLeagues()..getMatches(39)),
+        BlocProvider(
+          create: (context) => LoginCubit(),
+        ),
+        BlocProvider(
+          create: (context) => RegisterCubit(),
+        ),
+        BlocProvider(create: (context) => AppCubit()..initData()),
       ],
       child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Live Score',
-      theme: lightTheme,
-      home:  startScreen(),
+        debugShowCheckedModeBanner: false,
+        title: 'Live Score',
+        theme: lightTheme,
+        home: startScreen(),
       ),
     );
   }
 
-
-  Widget startScreen()
-  {
-    if(UID != null) {
-      return HomeLayout();
+  Widget startScreen() {
+    if (UID != null) {
+      return const HomeLayout();
     }
     return LoginScreen();
   }
 }
-

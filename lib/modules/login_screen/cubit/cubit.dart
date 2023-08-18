@@ -22,25 +22,30 @@ class LoginCubit extends Cubit<LoginStates> {
   Future<void> userLogin({
     required String email,
     required String password,
+    required Function() onSuccess,
   }) async {
     emit(LoginLoadingState());
     FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
       await CacheHelper.putData(key: 'uid', value: value.user!.uid);
-      userModel =
-          UserModel(name: value.user!.displayName, email: value.user!.email);
+      UID = value.user!.uid;
+      userModel = UserModel(
+        name: value.user!.displayName,
+        email: value.user!.email,
+      );
       emit(LoginSuccessState());
-      await getUserData(value.user!.uid);
+      await getUserData(value.user!.uid).then((value) {
+        onSuccess.call();
+      });
     }).catchError((onError) {
       print('Error While Signing In : $onError ');
       emit(LoginErrorState(onError.message.toString()));
     });
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<void> signInWithGoogle({required Function() onSuccess}) async {
     emit(LoginLoadingState());
-
     GoogleSignInAuthentication? googleSignInAuthentication;
     _googleSignIn.signIn().then((value) {
       if (value == null) {
@@ -61,8 +66,10 @@ class LoginCubit extends Cubit<LoginStates> {
               email: user.user!.email!,
               name: user.user!.displayName!,
               uid: user.user!.uid);
-          getUserData(user.user!.uid).then((value) {
-            emit(LoginSuccessState());
+          emit(LoginSuccessState());
+          await getUserData(user.user!.uid).then((value) async {
+            await CacheHelper.putData(key: "googleSignIn", value: true);
+            onSuccess.call();
           });
         }).catchError((onError) {
           print('Error : $onError');
@@ -107,13 +114,18 @@ class LoginCubit extends Cubit<LoginStates> {
     });
   }
 
-  void signOut() async {
-    _googleSignIn.signOut().then((value) {
-      print('sign Out');
-    }).catchError((onError) {
-      print('Error While Signing Out : $onError ');
-    });
+  Future<void> signOut() async {
+    bool isGoogleSignIn = CacheHelper.getData("googleSignIn") ?? false;
+    if (isGoogleSignIn) {
+      _googleSignIn.signOut().then((value) {
+        print("Google Sign out");
+      }).catchError((onError) {
+        print('Error While Signing Out : $onError ');
+      });
+      await CacheHelper.removeData(key: 'googleSignIn');
+    }
     await CacheHelper.removeData(key: 'uid');
+    print('sign Out');
   }
 
   Future<void> getUserData(uid) async {

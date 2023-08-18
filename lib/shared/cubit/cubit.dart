@@ -32,6 +32,7 @@ class AppCubit extends Cubit<AppStates> {
   List<Response> liveMatches = [];
   List<Response> nsSearchedMatches = [];
   List<Response> searchedLiveMatches = [];
+  bool isError = false;
 
   void changeTabIndex(index) {
     tabIndex = index;
@@ -299,7 +300,6 @@ class AppCubit extends Cubit<AppStates> {
       value.data() != null
           ? userModel = UserModel.fromjson(value.data()!)
           : userModel = null;
-      print(userModel);
       emit(GetUserSuccessState());
     }).catchError((onError) {
       print('Error While Getting : $onError');
@@ -391,8 +391,10 @@ class AppCubit extends Cubit<AppStates> {
       });
     }
   }
+
+  void initData() async {
+    await getUserData(UID);
+    await getLeagues();
+    await getMatches(39);
+  }
 }
-
-/*
-
- */

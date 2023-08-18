@@ -6,7 +6,6 @@ import 'package:football_scores/shared/components/components.dart';
 import 'package:football_scores/shared/components/constants.dart';
 import 'package:football_scores/shared/cubit/cubit.dart';
 import 'package:football_scores/shared/cubit/states.dart';
-import 'package:football_scores/shared/network/local/cache_helper.dart';
 import 'package:football_scores/shared/styles/colors/colors.dart';
 import 'package:football_scores/shared/styles/icon_broken.dart';
 
@@ -124,8 +123,8 @@ class ProfileScreen extends StatelessWidget {
                             defultButton(
                                 width: 100,
                                 function: () {
-                                  LoginCubit.get(context).signOut();
-                                  CacheHelper.removeData(key: 'uid')
+                                  LoginCubit.get(context)
+                                      .signOut()
                                       .then((value) {
                                     userModel = null;
                                     UID = null;

@@ -7,7 +7,6 @@ import 'package:football_scores/modules/login_screen/cubit/cubit.dart';
 import 'package:football_scores/modules/login_screen/cubit/states.dart';
 import 'package:football_scores/modules/register_screen/register_screen.dart';
 import 'package:football_scores/shared/components/components.dart';
-import 'package:football_scores/shared/components/constants.dart';
 import 'package:football_scores/shared/styles/icon_broken.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -20,13 +19,6 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<LoginCubit, LoginStates>(
       listener: (context, state) {
-        if (state is GetUserLoginSuccessState) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeLayout(),
-              ));
-        }
         if (state is LoginErrorState) {
           showToast(message: state.error, state: ToastStates.ERROR);
         }
@@ -107,8 +99,13 @@ class LoginScreen extends StatelessWidget {
                                   function: () {
                                     if (formKey.currentState!.validate()) {
                                       cubit.userLogin(
-                                          email: emailController.text,
-                                          password: passwordController.text);
+                                        email: emailController.text,
+                                        password: passwordController.text,
+                                        onSuccess: () {
+                                          navigateTo(
+                                              context, const HomeLayout());
+                                        },
+                                      );
                                     }
                                   },
                                   name: 'Login');
@@ -144,11 +141,11 @@ class LoginScreen extends StatelessWidget {
                             elevation: 7,
                             child: IconButton(
                               onPressed: () {
-                                cubit.signInWithGoogle().then((value) {
-                                  if (userModel != null) {
+                                cubit.signInWithGoogle(
+                                  onSuccess: () {
                                     navigateTo(context, const HomeLayout());
-                                  }
-                                }).catchError((onError) {});
+                                  },
+                                );
                               },
                               icon: const FaIcon(FontAwesomeIcons.google),
                             ),

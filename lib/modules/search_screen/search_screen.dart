@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
@@ -14,39 +12,27 @@ import 'package:football_scores/shared/cubit/states.dart';
 import 'package:football_scores/shared/styles/colors/colors.dart';
 import 'package:football_scores/shared/styles/icon_broken.dart';
 
-class SearchScreen extends SearchDelegate
-{
-
-  TextStyle? get searchFieldStyle => TextStyle(fontSize: 14 );
+class SearchScreen extends SearchDelegate {
+  @override
+  TextStyle? get searchFieldStyle => TextStyle(fontSize: 14);
   @override
   String? get searchFieldLabel => 'Search for league';
-  List<String> suggestions = [
-  ];
+  List<String> suggestions = [];
   @override
   ThemeData appBarTheme(BuildContext context) {
     return ThemeData(
       appBarTheme: AppBarTheme(
-        titleTextStyle: TextStyle(
-            fontSize: 14,
-            fontFamily: 'Jannah'
-        ),
+        titleTextStyle: TextStyle(fontSize: 14, fontFamily: 'Jannah'),
         foregroundColor: Colors.black,
         color: Colors.grey[100],
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.grey[100],
-          statusBarIconBrightness: Brightness.dark
-        ),
+            statusBarColor: Colors.grey[100],
+            statusBarIconBrightness: Brightness.dark),
         elevation: 2,
       ),
-      textTheme: TextTheme(
-        bodyText1: TextStyle(
-            fontSize: 14,
-            fontFamily: 'Jannah'
-        )
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: InputBorder.none
-      ),
+      textTheme:
+          TextTheme(bodyLarge: TextStyle(fontSize: 14, fontFamily: 'Jannah')),
+      inputDecorationTheme: InputDecorationTheme(border: InputBorder.none),
       primarySwatch: buildMaterialColor(premierColor!),
       textSelectionTheme: TextSelectionThemeData(
         //cursorColor: Colors.red,
@@ -55,82 +41,96 @@ class SearchScreen extends SearchDelegate
       ), // cursor color
     );
   }
+
   @override
   List<Widget>? buildActions(BuildContext context) {
+    return null;
   }
+
   @override
   Widget? buildLeading(BuildContext context) {
-    return IconButton(onPressed: ()
-        {
+    return IconButton(
+        onPressed: () {
           return close(context, null);
-        }, icon: Icon(IconBroken.Arrow___Left));
+        },
+        icon: Icon(IconBroken.Arrow___Left));
   }
-  @override
-  Widget buildResults(BuildContext context)
-  {
-    AppCubit.get(context).getSaerchedLeague(query);
-    return  BlocConsumer<AppCubit , AppStates>(
-        listener: (context, state) {
 
-    }, builder: (context, state) {
-      var list = AppCubit.get(context).search;
-      var cubit = AppCubit.get(context);
-      return ConditionalBuilder(condition: list != null,
-          builder: (context) {
-            return ConditionalBuilder(condition: list!.response.isNotEmpty,
+  @override
+  Widget buildResults(BuildContext context) {
+    AppCubit.get(context).getSaerchedLeague(query);
+    return BlocConsumer<AppCubit, AppStates>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          var list = AppCubit.get(context).search;
+          var cubit = AppCubit.get(context);
+          return ConditionalBuilder(
+            condition: list != null,
+            builder: (context) {
+              return ConditionalBuilder(
+                condition: list!.response.isNotEmpty,
                 builder: (context) {
                   return ListView.separated(
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return buildSearchedItem(context , cubit,list.response[index]);
+                        return buildSearchedItem(
+                            context, cubit, list.response[index]);
                       },
                       separatorBuilder: (context, index) {
-                        return
-                          Container(
-                            width: double.infinity,
-                            height: 1,
-                            color: Colors.grey[300],
-                          );
-                      }, itemCount: list.response.length);
+                        return Container(
+                          width: double.infinity,
+                          height: 1,
+                          color: Colors.grey[300],
+                        );
+                      },
+                      itemCount: list.response.length);
                 },
-                fallback: (context) => Center(child: Text(
-                    'No Searched Items'
-                   , style: TextStyle(
-                  fontFamily: 'Jannah',
-                    fontSize: 25,
+                fallback: (context) => Center(
+                  child: Text(
+                    'No Searched Items',
+                    style: TextStyle(
+                      fontFamily: 'Jannah',
+                      fontSize: 25,
+                    ),
+                  ),
                 ),
-                ),),);
-          },
-          fallback: (context) => Center(child: CircularProgressIndicator(),),);
-    });
+              );
+            },
+            fallback: (context) => Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        });
   }
-  Widget buildSearchedItem(context , AppCubit cubit , LeagueResponse model)
-  {
+
+  Widget buildSearchedItem(context, AppCubit cubit, LeagueResponse model) {
     return InkWell(
-      onTap: ()
-      {
-          cubit.getStandings(model.id!).then((value)
-          {
-            cubit.getMatches(model.id! , isSearch: true).then((value)
-            {
-              NavigateTo(context, StandingsScreen(model));
-            });
+      onTap: () {
+        cubit.getStandings(model.id!).then((value) {
+          cubit.getMatches(model.id!, isSearch: true).then((value) {
+            navigateTo(context, StandingsScreen(model));
           });
+        });
       },
       child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
           children: [
-            buildImage('${model.logo}' , hight: 65 , width: 65 , fit: BoxFit.contain),
+            buildImage('${model.logo}',
+                hight: 65, width: 65, fit: BoxFit.contain),
             SizedBox(
               width: 20,
             ),
-            Text('${model.name}' , style: TextStyle(fontSize: 20),),
+            Text(
+              '${model.name}',
+              style: TextStyle(fontSize: 20),
+            ),
           ],
-      ),
         ),
+      ),
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     return ListView.builder(
@@ -138,12 +138,9 @@ class SearchScreen extends SearchDelegate
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(suggestions[index]),
-          onTap: ()
-          {
-      
-          },
+          onTap: () {},
         );
-      },);
+      },
+    );
   }
-
 }

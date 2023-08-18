@@ -1,13 +1,13 @@
 
 
-import 'package:bloc/bloc.dart';
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:football_scores/models/user_model.dart';
 import 'package:football_scores/modules/register_screen/cubit/states.dart';
 import 'package:football_scores/shared/components/constants.dart';
-import 'package:football_scores/shared/cubit/cubit.dart';
 import 'package:football_scores/shared/network/local/cache_helper.dart';
 
 class RegisterCubit extends Cubit<RegisterStates>
@@ -30,7 +30,7 @@ class RegisterCubit extends Cubit<RegisterStates>
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((value) {
           var user = value;
-      UserCreate(email: email, name: name, uid: value.user!.uid).then((value) async
+      userCreate(email: email, name: name, uid: value.user!.uid).then((value) async
       {
         await getUserData(user.user!.uid);
       });
@@ -39,7 +39,7 @@ class RegisterCubit extends Cubit<RegisterStates>
       emit(RegisterErrorState(onError.toString()));
     });
   }
-  Future<void> UserCreate({
+  Future<void> userCreate({
     required String email,
     required String name,
     required String uid,
@@ -80,7 +80,7 @@ class RegisterCubit extends Cubit<RegisterStates>
       print("HAHAHAHAHAH : $userModel");
       emit(RegisterSuccessState());
     }).catchError((onError) {
-      print('Error While Getting : ${onError}');
+      print('Error While Getting : $onError');
       RegisterErrorState(onError.toString());
     });
   }

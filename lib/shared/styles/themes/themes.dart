@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:football_scores/shared/components/components.dart';
 import 'package:football_scores/shared/styles/colors/colors.dart';
-import 'package:hexcolor/hexcolor.dart';
 
 ThemeData lightTheme =  ThemeData(
     textSelectionTheme: const TextSelectionThemeData(

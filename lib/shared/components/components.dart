@@ -1,14 +1,11 @@
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors, constant_identifier_names, avoid_print
 
-// ignore_for_file: sort_child_properties_last, prefer_const_constructors
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:football_scores/models/match_model.dart';
 import 'package:football_scores/modules/states_screen/states_screen.dart';
 import 'package:football_scores/shared/cubit/cubit.dart';
 import 'package:football_scores/shared/styles/colors/colors.dart';
-import 'package:hexcolor/hexcolor.dart';
 
 Widget defaultformField({
   required String lable,
@@ -35,7 +32,7 @@ Widget defaultformField({
       keyboardType: type,
       decoration: InputDecoration(
         contentPadding:
-        const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
         suffixIcon: suffix != null
             ? IconButton(icon: Icon(suffix), onPressed: suffixpressed)
             : null,
@@ -44,28 +41,26 @@ Widget defaultformField({
         prefixIcon: Icon(prefix),
         fillColor: defaultColor,
         border: OutlineInputBorder(),
-        errorBorder:OutlineInputBorder(
-          borderSide:  BorderSide(color: defaultColor!, width: 1.3),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: defaultColor!, width: 1.3),
         ),
-        focusedErrorBorder:OutlineInputBorder(
-          borderSide:  BorderSide(color: defaultColor!, width: 1.3),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: defaultColor!, width: 1.3),
         ),
-        errorStyle: TextStyle(
-            color: defaultColor
-        ),
+        errorStyle: TextStyle(color: defaultColor),
         focusedBorder: OutlineInputBorder(
-          borderSide:  BorderSide(color: premierColor!, width: 1.3),
+          borderSide: BorderSide(color: premierColor!, width: 1.3),
         ),
       ),
       onTap: onTap,
     );
 
 Widget defultButton(
-    {double width = double.infinity,
-      bool isUpper = true,
-      double raduis = 0.0,
-      required VoidCallback? function,
-      required String Name}) =>
+        {double width = double.infinity,
+        bool isUpper = true,
+        double raduis = 0.0,
+        required VoidCallback? function,
+        required String name}) =>
     Container(
       height: 40.0,
       width: width,
@@ -74,7 +69,7 @@ Widget defultButton(
         color: premierColor,
         onPressed: function,
         child: Text(
-          isUpper ? Name.toUpperCase() : Name,
+          isUpper ? name.toUpperCase() : name,
           style: TextStyle(
             color: Colors.white,
           ),
@@ -92,7 +87,7 @@ MaterialColor buildMaterialColor(Color color) {
   for (int i = 1; i < 10; i++) {
     strengths.add(0.1 * i);
   }
-  strengths.forEach((strength) {
+  for (var strength in strengths) {
     final double ds = 0.5 - strength;
     swatch[(strength * 1000).round()] = Color.fromRGBO(
       r + ((ds < 0 ? r : (255 - r)) * ds).round(),
@@ -100,11 +95,11 @@ MaterialColor buildMaterialColor(Color color) {
       b + ((ds < 0 ? b : (255 - b)) * ds).round(),
       1,
     );
-  });
+  }
   return MaterialColor(color.value, swatch);
 }
 
-void ShowToast({required String message, required ToastStates state}) {
+void showToast({required String message, required ToastStates state}) {
   Color? color;
   switch (state) {
     case ToastStates.SUCCESS:
@@ -128,28 +123,29 @@ void ShowToast({required String message, required ToastStates state}) {
     fontSize: 15.0,
   );
 }
+
 enum ToastStates { SUCCESS, ERROR, WARNING }
 
-void NavigateTo(context , screen)
-{
-  Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return screen;
-  },));
+void navigateTo(context, screen) {
+  Navigator.push(context, MaterialPageRoute(
+    builder: (context) {
+      return screen;
+    },
+  ));
 }
-Widget buildMatchItem(cubit, Response model , int index , context)
-{
-  double elevation = cubit.MatchIndex == index ? 8 : 0;
-  Color color = cubit.MatchIndex == index ? Colors.white: Colors.white70;
+
+Widget buildMatchItem(AppCubit cubit, Response model, int index, context) {
+  double elevation = cubit.matchIndex == index ? 8 : 0;
+  Color color = cubit.matchIndex == index ? Colors.white : Colors.white70;
   return InkWell(
-    onTap: ()
-    {
+    onTap: () {
       cubit.changeMatchIndex(index);
     },
     child: Card(
       color: color,
       elevation: elevation,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
+      child: SizedBox(
         height: 75,
         width: double.infinity,
         child: Padding(
@@ -167,14 +163,15 @@ Widget buildMatchItem(cubit, Response model , int index , context)
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black87 , fontWeight: FontWeight.bold
-                            )),
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ),
                     SizedBox(
                       width: 7,
                     ),
-                    buildImage('${model.teams!.home!.logo}' , hight: 40 , width: 40),
+                    buildImage('${model.teams!.home!.logo}',
+                        hight: 40, width: 40),
                   ],
                 ),
               ),
@@ -186,20 +183,22 @@ Widget buildMatchItem(cubit, Response model , int index , context)
                     Text(AppCubit.get(context).formatTime(model),
                         style: TextStyle(
                             fontSize: 14,
-                            color: Colors.deepOrange , fontWeight: FontWeight.bold
-                        )),
+                            color: Colors.deepOrange,
+                            fontWeight: FontWeight.bold)),
                     Text(AppCubit.get(context).formatDate(model),
                         style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey , fontWeight: FontWeight.bold
-                        )),
-                  ],),
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
               Expanded(
                 flex: 2,
                 child: Row(
                   children: [
-                    buildImage('${model.teams!.away!.logo}' , width: 40 , hight: 40),
+                    buildImage('${model.teams!.away!.logo}',
+                        width: 40, hight: 40),
                     SizedBox(
                       width: 7,
                     ),
@@ -210,7 +209,8 @@ Widget buildMatchItem(cubit, Response model , int index , context)
                             overflow: TextOverflow.clip,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black87 , fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
                             )),
                       ),
                     ),
@@ -224,20 +224,19 @@ Widget buildMatchItem(cubit, Response model , int index , context)
     ),
   );
 }
-Widget buildLiveMatchItem(AppCubit cubit , context ,Response model)
-{
 
+Widget buildLiveMatchItem(AppCubit cubit, context, Response model) {
   return InkWell(
-    onTap: ()
-    {
+    onTap: () {
       //  cubit.getLineUp(867996);
-      cubit.getStats(model.fixture!.id!).then((value)
-      {
-        cubit.getLineUp(model.fixture!.id!).then((value)
-        {
-          cubit.getEvents(model.fixture!.id!).then((value)
-          {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => StatsScreen(model),));
+      cubit.getStats(model.fixture!.id!).then((value) {
+        cubit.getLineUp(model.fixture!.id!).then((value) {
+          cubit.getEvents(model.fixture!.id!).then((value) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StatsScreen(model),
+                ));
           });
         });
       });
@@ -260,8 +259,7 @@ Widget buildLiveMatchItem(AppCubit cubit , context ,Response model)
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
-                children:
-                [
+                children: [
                   Center(
                     child: Column(
                       children: [
@@ -269,33 +267,39 @@ Widget buildLiveMatchItem(AppCubit cubit , context ,Response model)
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.headline6!.copyWith(
-                              height: 1.2,
-                              color: Colors.white,
-                            )),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(
+                                  height: 1.2,
+                                  color: Colors.white,
+                                )),
                         SizedBox(
                           height: 0,
                         ),
-                        Text('${model.league!.round}' , style: Theme.of(context).textTheme.caption!.copyWith(
-                            fontSize: 16,
-                            color: Colors.grey[500]
-                        ))
+                        Text('${model.league!.round}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                    fontSize: 16, color: Colors.grey[500]))
                       ],
                     ),
                   ),
                   Row(
                     children: [
-                      buildMatchTeamItem('${model.teams?.home?.logo}'
-                          ,'${model.teams?.home?.name}','Home'),
+                      buildMatchTeamItem('${model.teams?.home?.logo}',
+                          '${model.teams?.home?.name}', 'Home'),
                       Expanded(
                         child: Column(
                           children: [
-                            Text('${model.goals!.home} : ${model.goals!.away}',
+                            Text(
+                              '${model.goals!.home} : ${model.goals!.away}',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40,
-                                  color: Colors.white
-                              ),),
+                                  color: Colors.white),
+                            ),
                             SizedBox(
                               height: 10,
                             ),
@@ -307,64 +311,64 @@ Widget buildLiveMatchItem(AppCubit cubit , context ,Response model)
                                 ),
                                 CircleAvatar(
                                   radius: 18,
-                                  backgroundColor: Color.fromARGB(255,102,53,102),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 102, 53, 102),
                                 ),
-                                Text(model.fixture!.status!.short != 'HT'? "${model.fixture!.status!.elapsed}'" : "HT" , style: TextStyle(
-                                    color: Colors.white
-                                ),)
+                                Text(
+                                  model.fixture!.status!.short != 'HT'
+                                      ? "${model.fixture!.status!.elapsed}'"
+                                      : "HT",
+                                  style: TextStyle(color: Colors.white),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
-                      buildMatchTeamItem('${model.teams?.away?.logo}'
-                          ,'${model.teams?.away?.name}','Away'),
+                      buildMatchTeamItem('${model.teams?.away?.logo}',
+                          '${model.teams?.away?.name}', 'Away'),
                     ],
                   )
                 ],
               ),
-            )
-        ),
+            )),
       ),
     ),
   );
 }
-Widget buildMatchTeamItem(String url , String name ,String state )
-{
+
+Widget buildMatchTeamItem(String url, String name, String state) {
   return Expanded(
     child: Column(
-      mainAxisAlignment:MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildImage(url , width: 60 , hight: 60),
+        buildImage(url, width: 60, hight: 60),
         SizedBox(
           height: 10,
         ),
-        Text(name,
+        Text(
+          name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              height: 1.1
-          ),),
+          style: TextStyle(fontSize: 18, color: Colors.white, height: 1.1),
+        ),
         SizedBox(
           height: 10,
         ),
-        Text(state ,
-          style: TextStyle(
-              fontSize: 15,
-              color: Colors.grey[500],
-              height: 1.1
-          ),)
+        Text(
+          state,
+          style: TextStyle(fontSize: 15, color: Colors.grey[500], height: 1.1),
+        )
       ],
     ),
   );
 }
 
-Widget buildImage(String url , { double width = 100 , double hight = 100 , BoxFit fit = BoxFit.cover} ) {
+Widget buildImage(String url,
+    {double width = 100, double hight = 100, BoxFit fit = BoxFit.cover}) {
   return Image.network(
     url,
-    height: hight ,
+    height: hight,
     width: width,
     fit: fit,
     errorBuilder: (context, error, stackTrace) {
@@ -373,23 +377,21 @@ Widget buildImage(String url , { double width = 100 , double hight = 100 , BoxFi
         height: hight,
         width: width,
         fit: fit,
-        image: AssetImage('assets/images/error.png'),);
+        image: AssetImage('assets/images/error.png'),
+      );
     },
-    loadingBuilder: (BuildContext context, Widget child,
-        ImageChunkEvent? loadingProgress) {
+    loadingBuilder:
+        (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
       if (loadingProgress == null) return child;
       return Center(
-        child:
-        Container(
+        child: SizedBox(
           height: hight,
           width: width,
           child: CircularProgressIndicator(
             color: premierColor,
-            value: loadingProgress.expectedTotalBytes !=
-                null
+            value: loadingProgress.expectedTotalBytes != null
                 ? loadingProgress.cumulativeBytesLoaded /
-                loadingProgress.expectedTotalBytes!
-                    .toInt()
+                    loadingProgress.expectedTotalBytes!.toInt()
                 : null,
           ),
         ),
@@ -397,7 +399,8 @@ Widget buildImage(String url , { double width = 100 , double hight = 100 , BoxFi
     },
   );
 }
-void NavigateAndFinish(context, widget) {
+
+void navigateAndFinish(context, widget) {
   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
     return widget;
   }), (rout) => false);

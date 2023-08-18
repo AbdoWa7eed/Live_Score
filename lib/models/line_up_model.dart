@@ -1,7 +1,4 @@
 
-import 'dart:convert';
-
-import 'package:football_scores/models/events_model.dart';
 
 class LineUpModel
 {

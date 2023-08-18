@@ -2,7 +2,6 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:football_scores/firebase_options.dart';
 import 'package:football_scores/layout/home_layout.dart';
@@ -14,9 +13,7 @@ import 'package:football_scores/shared/components/constants.dart';
 import 'package:football_scores/shared/cubit/cubit.dart';
 import 'package:football_scores/shared/network/local/cache_helper.dart';
 import 'package:football_scores/shared/network/remote/dio_helper.dart';
-import 'package:football_scores/shared/styles/colors/colors.dart';
 import 'package:football_scores/shared/styles/themes/themes.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,12 +23,13 @@ void main() async {
   DioHelper.init();
   await CacheHelper.init();
   UID = CacheHelper.getData('uid');
-  print("UID : $UID");
   runApp(MyApp());
   Bloc.observer = MyBlocObserver();
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -48,6 +46,7 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
 
   Widget startScreen()
   {

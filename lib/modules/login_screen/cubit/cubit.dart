@@ -1,7 +1,7 @@
+// ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:football_scores/models/user_model.dart';
 import 'package:football_scores/modules/login_screen/cubit/states.dart';
@@ -9,71 +9,73 @@ import 'package:football_scores/shared/components/constants.dart';
 import 'package:football_scores/shared/network/local/cache_helper.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class LoginCubit extends Cubit<LoginStates>
-{
+class LoginCubit extends Cubit<LoginStates> {
   LoginCubit() : super(LoginIntialState());
   static LoginCubit get(context) => BlocProvider.of(context);
   bool isPass = true;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  void changePasswordSuffix()
-  {
+  void changePasswordSuffix() {
     isPass = !isPass;
     emit(ChangeSuffixState());
   }
-  Future<void> UserLogin(
-  {
+
+  Future<void> userLogin({
     required String email,
     required String password,
-  }) async
-  {
+  }) async {
     emit(LoginLoadingState());
-    FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) async
-    {
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((value) async {
       await CacheHelper.putData(key: 'uid', value: value.user!.uid);
-      userModel = UserModel(name: value.user!.displayName , email: value.user!.email);
+      userModel =
+          UserModel(name: value.user!.displayName, email: value.user!.email);
       emit(LoginSuccessState());
       await getUserData(value.user!.uid);
-    }).catchError((onError)
-    {
+    }).catchError((onError) {
       print('Error While Signing In : $onError ');
       emit(LoginErrorState(onError.message.toString()));
     });
   }
-  Future<void> signInWithGoogle() async
-  {
+
+  Future<void> signInWithGoogle() async {
     emit(LoginLoadingState());
 
     GoogleSignInAuthentication? googleSignInAuthentication;
-     _googleSignIn.signIn().then((value) {
-       if(value == null)
-       {
-         emit(LoginErrorState('Please add an account'));
-         return;
-       }
-        value.authentication.then((value) async {
-          googleSignInAuthentication = value;
-          AuthCredential authCredential = GoogleAuthProvider.credential(accessToken: googleSignInAuthentication?.accessToken , idToken: googleSignInAuthentication?.idToken);
-          await FirebaseAuth.instance.signInWithCredential(authCredential).then((value) async
-          {
-            UserCredential user = value;
-            await UserCreate(image: user.user!.photoURL!, email: user.user!.email!, name: user.user!.displayName!, uid: user.user!.uid);
-            getUserData(user.user!.uid).then((value)
-            {
-              emit(LoginSuccessState());
-            });
-          }).catchError((onError)
-          {
-            emit(LoginErrorState(onError.message.toString()));
+    _googleSignIn.signIn().then((value) {
+      if (value == null) {
+        emit(LoginErrorState('Please add an account'));
+        return;
+      }
+      value.authentication.then((value) async {
+        googleSignInAuthentication = value;
+        AuthCredential authCredential = GoogleAuthProvider.credential(
+            accessToken: googleSignInAuthentication?.accessToken,
+            idToken: googleSignInAuthentication?.idToken);
+        await FirebaseAuth.instance
+            .signInWithCredential(authCredential)
+            .then((value) async {
+          UserCredential user = value;
+          await userCreate(
+              image: user.user!.photoURL!,
+              email: user.user!.email!,
+              name: user.user!.displayName!,
+              uid: user.user!.uid);
+          getUserData(user.user!.uid).then((value) {
+            emit(LoginSuccessState());
           });
-
+        }).catchError((onError) {
+          print('Error : $onError');
+          emit(LoginErrorState(onError.message.toString()));
         });
-    }).catchError((onError)
-    {
+      });
+    }).catchError((onError) {
+      print('Error : $onError');
       emit(LoginErrorState(onError.toString()));
     });
-
   }
-  Future<void> UserCreate({
+
+  Future<void> userCreate({
     required String email,
     required String name,
     required String uid,
@@ -83,7 +85,9 @@ class LoginCubit extends Cubit<LoginStates>
       email: email,
       name: name,
       uid: uid,
-      image: image?? 'https://img.freepik.com/free-vector/illustration-user-avatar-icon_53876-5907.jpg?w=740&t=st=1660748706~exp=1660749306~hmac=23fc25de06d2ebeaa9c9db3c14fc2d58f9ba758d866025b1072e5c9b4f0b8b6b',);
+      image: image ??
+          'https://img.freepik.com/free-vector/illustration-user-avatar-icon_53876-5907.jpg?w=740&t=st=1660748706~exp=1660749306~hmac=23fc25de06d2ebeaa9c9db3c14fc2d58f9ba758d866025b1072e5c9b4f0b8b6b',
+    );
     FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -92,11 +96,9 @@ class LoginCubit extends Cubit<LoginStates>
       CacheHelper.putData(
         key: 'uid',
         value: uid,
-      ).then((value)
-      {
+      ).then((value) {
         print('user Created');
-      }).catchError((onError)
-      {});
+      }).catchError((onError) {});
       await getUserData(uid);
       emit(CreateUserLoginSuccessState());
     }).catchError((onError) {
@@ -104,17 +106,16 @@ class LoginCubit extends Cubit<LoginStates>
       emit(CreateUserLoginErrorState(onError.toString()));
     });
   }
-  void signOut() async
-  {
-    _googleSignIn.signOut().then((value)
-    {
-    print('sign Out');
-    }).catchError((onError)
-    {
+
+  void signOut() async {
+    _googleSignIn.signOut().then((value) {
+      print('sign Out');
+    }).catchError((onError) {
       print('Error While Signing Out : $onError ');
     });
     await CacheHelper.removeData(key: 'uid');
   }
+
   Future<void> getUserData(uid) async {
     emit(GetUserLoginLoadingState());
     FirebaseFirestore.instance.collection('users').doc(uid).get().then((value) {
@@ -125,8 +126,8 @@ class LoginCubit extends Cubit<LoginStates>
       print(userModel);
       emit(GetUserLoginSuccessState());
     }).catchError((onError) {
-      print('Error While Getting : ${onError}');
+      print('Error While Getting : $onError');
       GetUserLoginErrorState(onError.toString());
     });
-    }
+  }
 }
